@@ -36,7 +36,7 @@ def save_string_to_file(text, direktorija, ime_datoteke):
     return 
 
 
-#funkcija, ki prenese glavno stran in jo shrani v datoteko.
+
 
 
 def save_frontpage(stran, direktorija, ime_datoteke):
@@ -52,7 +52,7 @@ mapa_s_podatki = 'podatki'
 ime_strani = "recepti.html" 
 pot=os.path.join(os.getcwd(),mapa_s_podatki)
 
-
+#
 
 
 
@@ -78,6 +78,54 @@ def funkcija_ki_naloži_strani_z_recepti():
         save_frontpage(link_do_spletne_strani(i),pot,ime_strani_i)
         print(i)
     
+#funkcija_ki_naloži_strani_z_recepti()
 
-def odpri_strani_receptov():
-    
+def funkcija_ki_odpre_stran_z_receptom():
+    for i in list(range(int(st_zavihkov))):
+        i=str(int(i)+1)
+        #odpri html datoteko
+        ime_datoteke="stran_z_recepti_"+f"{i}"+".html"
+        datoteka=os.path.join(pot, ime_datoteke)
+        
+        with open(datoteka, "r", encoding="utf-8") as html:
+            #poišče linke do strani receptov
+            soup=BeautifulSoup(html,'html.parser')
+        seznam_vseh_linkov_do_receptov=soup.find_all('a', class_='group border border-black/10 dark:border-white/10 flex rounded-lg shadow-small flex-col h-full transition hover:shadow-center-large')
+        
+        #naloži strani receptov v direktorij recepti
+        for a_znacka in seznam_vseh_linkov_do_receptov:
+            href = a_znacka['href']
+            link= f"https://okusno.je{href}"
+            direktorija="recepti"
+            ime_recepta=href[8:]+".html"
+            
+            save_frontpage(link, direktorija, ime_recepta)
+
+
+#funkcija_ki_odpre_stran_z_receptom()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#todo
+#pobrati linke do receptov
+#iz vsake strani recepta pobrati:
+#seznam sestavin-število sestavin
+#število besed v receptu
+#težavnost recepta
+#šas priprave
+#energijska vrednost

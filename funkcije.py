@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import re
 
 
 def link_do_spletne_strani(stevilka_strani):
@@ -33,10 +34,7 @@ def save_string_to_file(text, direktorija, ime_datoteke):
     path = os.path.join(direktorija, ime_datoteke)
     with open(path, 'w', encoding='utf-8') as file_out:
         file_out.write(text)
-    return 
-
-
-
+    return
 
 
 def save_frontpage(stran, direktorija, ime_datoteke):
@@ -49,14 +47,13 @@ def save_frontpage(stran, direktorija, ime_datoteke):
 povezava_do_prve_strani = link_do_spletne_strani(1)
 stran = naloži_spletno_stran(povezava_do_prve_strani)
 mapa_s_podatki = 'podatki'
-ime_strani = "recepti.html" 
-pot=os.path.join(os.getcwd(),mapa_s_podatki)
+ime_strani = "recepti.html"
+pot = os.path.join(os.getcwd(), mapa_s_podatki)
 
-#
+#########################################################################################################
 
 
-
-def stevilo_zavihkov(path,ime_datoteke):
+def stevilo_zavihkov(path, ime_datoteke):
     pot = os.path.join(path, ime_datoteke)
     with open(pot, 'r', encoding='utf-8') as html:
         # poišče število zavihkov na html strani
@@ -67,65 +64,150 @@ def stevilo_zavihkov(path,ime_datoteke):
     return vrednost
 
 
-st_zavihkov=stevilo_zavihkov(pot,"recepti.html")
-
+st_zavihkov = stevilo_zavihkov(pot, "recepti.html")
 
 
 def funkcija_ki_naloži_strani_z_recepti():
     for i in list(range(int(st_zavihkov))):
-        i=str(int(i)+1)
-        ime_strani_i="stran_z_recepti_"+f"{i}"+".html"
-        save_frontpage(link_do_spletne_strani(i),pot,ime_strani_i)
-        print(i)
-    
-#funkcija_ki_naloži_strani_z_recepti()
+        i = str(int(i)+1)
+        ime_strani_i = "stran_z_recepti_"+f"{i}"+".html"
+        save_frontpage(link_do_spletne_strani(i), pot, ime_strani_i)
+
+
+# funkcija_ki_naloži_strani_z_recepti()---done
+
 
 def funkcija_ki_odpre_stran_z_receptom():
     for i in list(range(int(st_zavihkov))):
-        i=str(int(i)+1)
-        #odpri html datoteko
-        ime_datoteke="stran_z_recepti_"+f"{i}"+".html"
-        datoteka=os.path.join(pot, ime_datoteke)
-        
+        i = str(int(i)+1)
+        # odpri html datoteko
+        ime_datoteke = "stran_z_recepti_"+f"{i}"+".html"
+        datoteka = os.path.join(pot, ime_datoteke)
+
         with open(datoteka, "r", encoding="utf-8") as html:
-            #poišče linke do strani receptov
-            soup=BeautifulSoup(html,'html.parser')
-        seznam_vseh_linkov_do_receptov=soup.find_all('a', class_='group border border-black/10 dark:border-white/10 flex rounded-lg shadow-small flex-col h-full transition hover:shadow-center-large')
-        
-        #naloži strani receptov v direktorij recepti
+            # poišče linke do strani receptov
+            soup = BeautifulSoup(html, 'html.parser')
+        seznam_vseh_linkov_do_receptov = soup.find_all(
+            'a', class_='group border border-black/10 dark:border-white/10 flex rounded-lg shadow-small flex-col h-full transition hover:shadow-center-large')
+
+        # naloži strani receptov v direktorij recepti
         for a_znacka in seznam_vseh_linkov_do_receptov:
             href = a_znacka['href']
-            link= f"https://okusno.je{href}"
-            direktorija="recepti"
-            ime_recepta=href[8:]+".html"
-            
+            link = f"https://okusno.je{href}"
+            direktorija = "recepti"
+            ime_recepta = href[8:]+".html"
+
             save_frontpage(link, direktorija, ime_recepta)
 
 
-#funkcija_ki_odpre_stran_z_receptom()
+# funkcija_ki_odpre_stran_z_receptom()---done
 
 
+direktorij = "recepti"
+
+# funkcija,ki naredi slovar, ključ je ime recepta, vrednost pa je tuple stvari, ki jih bom poiskal
 
 
+def slovar_in_(direktorij):
+    seznam_datotek = os.listdir(direktorij)
+    for stran in seznam_datotek:
+        datoteka = os.path.join(direktorij, ime_datoteke)
+        with open(datoteka, "r", encoding="utf-8") as file:
+            html = file.read()
+        ime_datoteke = stran[:-5]
+        st_sestavin = ""
+        število_besed_v_receptu = ""
+        težavnost = ""
+        čas_priprave = ""
 
 
+def čas_priprave(html):
+    vzorec_priprava = r'PRIPRAVA</span>\s*((\d+ h )?\d+ min)'
+    čas_priprave = re.search(vzorec_priprava, html)
+    if čas_priprave:
+        return čas_priprave.group(1)
+    else:
+        return "0"
 
 
+def čas_kuhanja(html):
+    vzorec_kuhanje = r'KUHANJE</span>\s*((\d+ h )?\d+ min)'
+    čas_kuhanja = re.search(vzorec_kuhanje, html)
+    if čas_kuhanja:
+        return čas_kuhanja.group(1)
+    else:
+        return "0"
 
 
+def stevilo_sestavin(html):
+    vzorec_sestavine = r'<div class="w-2/3 md:4/5 lg:w-2/3 p-8 leading-normal flex items-center">(.*?)</div>'
+    sestavine = re.findall(vzorec_sestavine, html)
+    if sestavine:
+        return len(sestavine)
+    else:
+        return "ta recept nima sestavin"
 
 
+def tezavnost(html):
+    vzorec_tezavnosti = r'difficulty-(\d+)'
+    tezavnost = re.search(vzorec_tezavnosti, html)
+    if tezavnost:
+        return tezavnost.group(1)
+    else:
+        return "ta recept nima težavnosti"
 
 
+def vrsta_recepta(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    return soup.find('h2', class_='label bg-primary')
 
 
+def stevilo_besed_v_receptu(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    odstavki = soup.find_all(
+        'div', class_='leading-tight text-secondary dark:text-white/80 w-full font-semi transition hover:text-black dark:hover:text-white')
+    stevec = 0
+    for odstavek in odstavki:
+        besedilo = odstavek.get_text()
+        words = besedilo.split()
+        stevec += len(words)
+# print(sestavine("v-pecici-pecene-mesne-kroglice-in-krompir.html",direktorij))
 
 
-#todo
-#pobrati linke do receptov
-#iz vsake strani recepta pobrati:
-#seznam sestavin-število sestavin
-#število besed v receptu
-#težavnost recepta
-#šas priprave
-#energijska vrednost
+def energijska_vrednost(html):
+    vzorec = r'<td>\s*(\d+\.\d+) kCal\s*</td>'
+    # dotall je zato da gre regex čez več vrstic ker je energijske vrednosti v vrstici višje
+    energijska_vrednost = re.compile(vzorec, re.DOTALL)
+    vrednost = energijska_vrednost.search(html)
+    if vrednost:
+        return vrednost.group(1)
+    else:
+        return "ni podatka o energijski vrednosti"
+
+
+# def seznam_sestavin(direktorij):                                                               neuporabno
+#    seznam_datotek = os.listdir(direktorij)
+#    množica_sestavin=set()
+#    for stran in seznam_datotek:
+#        množica_sestavin.update(sestavine(stran,direktorij))
+#        print(stran)
+#    with open("seznam sestavin.txt","w",encoding="utf-8") as datoteka:
+#        for element in množica_sestavin:
+#            datoteka.write(element+"\n")
+#
+#
+# seznam_sestavin(direktorij)
+
+# test  čas_priprave("v-pecici-pecene-mesne-kroglice-in-krompir.html",direktorij)
+
+
+# def število_besed_v_receptu(ime_datoteke):
+
+    # todo
+    # pobrati linke do receptov---done
+    # iz vsake strani recepta pobrati:
+    # seznam sestavin-število sestavin---done
+    # število besed v receptu---done
+    # težavnost recepta---done
+    # šas priprave---done
+    # energijska vrednost

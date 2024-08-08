@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 import re
-
+import csv
 
 def link_do_spletne_strani(stevilka_strani):
     return f"https://okusno.je/iskanje?t=recipe&sort=score&p={stevilka_strani}"
@@ -49,7 +49,7 @@ stran = naloži_spletno_stran(povezava_do_prve_strani)
 mapa_s_podatki = 'podatki'
 ime_strani = "recepti.html"
 pot = os.path.join(os.getcwd(), mapa_s_podatki)
-
+direktorij = "recepti"
 #########################################################################################################
 
 
@@ -103,22 +103,7 @@ def funkcija_ki_odpre_stran_z_receptom():
 # funkcija_ki_odpre_stran_z_receptom()---done
 
 
-direktorij = "recepti"
-
 # funkcija,ki naredi slovar, ključ je ime recepta, vrednost pa je tuple stvari, ki jih bom poiskal
-
-
-def slovar_in_(direktorij):
-    seznam_datotek = os.listdir(direktorij)
-    for stran in seznam_datotek:
-        datoteka = os.path.join(direktorij, ime_datoteke)
-        with open(datoteka, "r", encoding="utf-8") as file:
-            html = file.read()
-        ime_datoteke = stran[:-5]
-        st_sestavin = ""
-        število_besed_v_receptu = ""
-        težavnost = ""
-        čas_priprave = ""
 
 
 def čas_priprave(html):
@@ -133,6 +118,15 @@ def čas_priprave(html):
 def čas_kuhanja(html):
     vzorec_kuhanje = r'KUHANJE</span>\s*((\d+ h )?\d+ min)'
     čas_kuhanja = re.search(vzorec_kuhanje, html)
+    if čas_kuhanja:
+        return čas_kuhanja.group(1)
+    else:
+        return "0"
+    
+
+def skupni_čas(html):
+    vzorec_skupaj = r'SKUPAJ</span>\s*((\d+ h )?\d+ min)'
+    čas_kuhanja = re.search(vzorec_skupaj, html)
     if čas_kuhanja:
         return čas_kuhanja.group(1)
     else:
@@ -159,7 +153,12 @@ def tezavnost(html):
 
 def vrsta_recepta(html):
     soup = BeautifulSoup(html, 'html.parser')
-    return soup.find('h2', class_='label bg-primary')
+    a=soup.find('h2', class_='label bg-primary')
+    
+    if a:
+        return a.text.strip()
+    else:
+        return "ta recept nima vrste"
 
 
 def stevilo_besed_v_receptu(html):
@@ -171,18 +170,73 @@ def stevilo_besed_v_receptu(html):
         besedilo = odstavek.get_text()
         words = besedilo.split()
         stevec += len(words)
+    if stevec==0:
+        return "to ni recept", "0"
+    else:
+        return stevec, len(odstavki)
 # print(sestavine("v-pecici-pecene-mesne-kroglice-in-krompir.html",direktorij))
 
 
 def energijska_vrednost(html):
-    vzorec = r'<td>\s*(\d+\.\d+) kCal\s*</td>'
-    # dotall je zato da gre regex čez več vrstic ker je energijske vrednosti v vrstici višje
-    energijska_vrednost = re.compile(vzorec, re.DOTALL)
-    vrednost = energijska_vrednost.search(html)
+    pattern = r'(\d+\.?\d*)\s*kCal'
+    # dotall je zato da gre regex čez več vrstic, ker je v vrstici višje
+    vrednost = re.search(pattern, html)
+    
     if vrednost:
-        return vrednost.group(1)
+        return vrednost.group(0).strip()
     else:
         return "ni podatka o energijski vrednosti"
+
+
+def zapisi_v_csv(direktorij):
+    seznam_datotek = os.listdir(direktorij)
+    števec_ni_recept=0
+    with open("podatki.csv","w",encoding="utf-8", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Ime recepta", "Število sestavin", "Število besed v receptu","Število odstavkov","Težavnost", "Čas priprave", "Čas kuhanja", "Skupni čas", "Vrsta kuhinje", "Energijska vrednost na porcijo"])
+        for stran in seznam_datotek:
+            datoteka = os.path.join(direktorij, stran)
+            with open(datoteka, "r", encoding="utf-8") as file:
+                html = file.read()
+            ime_recepta = stran[:-5]
+            st_sestavin = stevilo_sestavin(html)
+            število_besed_v_receptu, st_odstavkov = stevilo_besed_v_receptu(html)
+            težavnost = tezavnost(html)
+            priprava_čas = čas_priprave(html)
+            kuhanje_čas=čas_kuhanja(html)
+            čas_skupni=skupni_čas(html)
+            vrsta_receptov = vrsta_recepta(html)
+            energijska_vrednos = energijska_vrednost(html)
+
+            if število_besed_v_receptu=="to ni recept":
+                števec_ni_recept+=1
+                print(števec_ni_recept)
+                print(ime_recepta+število_besed_v_receptu)
+                pass
+            elif st_sestavin=="ta recept nima sestavin":
+                števec_ni_recept+=1
+                print(števec_ni_recept)
+            else:
+                writer.writerow([ime_recepta.strip(), st_sestavin, število_besed_v_receptu,st_odstavkov,težavnost,priprava_čas,kuhanje_čas,čas_skupni,vrsta_receptov,energijska_vrednos])
+                print(ime_recepta)
+    print(števec_ni_recept)
+
+#zapisi_v_csv(direktorij) done
+ste=0
+mnozica=set()
+seznam_datotek = os.listdir(direktorij)
+for stran in seznam_datotek:
+    datoteka = os.path.join(direktorij, stran)
+    with open(datoteka, "r", encoding="utf-8") as file:
+            html = file.read()
+    mnozica.add(vrsta_recepta(html))
+    ste+=1
+    print(ste)
+with open("vrste.txt","w",encoding="utf-8") as file:
+    for element in mnozica:
+        file.write(element+"\n")
+        print(element)
+
 
 
 # def seznam_sestavin(direktorij):                                                               neuporabno
@@ -210,4 +264,5 @@ def energijska_vrednost(html):
     # število besed v receptu---done
     # težavnost recepta---done
     # šas priprave---done
-    # energijska vrednost
+    # energijska vrednost--done
+    # zapiši v csv

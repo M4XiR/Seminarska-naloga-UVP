@@ -216,6 +216,7 @@ def main():
                 
     print(števec_ni_recept)
 
+if __name__ == "__main__":
+    main()
 
 
-main()

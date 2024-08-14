@@ -17,4 +17,6 @@ Program deluje, tako da najprej iz prve strani z recepti iz gumba konec, ki te p
   
 Te podatke nato zapiše v datoteko "podatki.csv".
 
-Če želite, pognati program sami naložite datoteki main.py in pomozne_funkcije.py in jih shranite v isto direktorijo. Da bo program deloval morate imeti naložen lybrary BeautifulSoup4 to naredite, tako da v ukazno vrstico napišete pip install BeautifulSoup4. Nato poženite main.py. Ta bo ustvaril datoteko "podatki.csv", kamor bo zapisoval podatke o receptih. Opozorilo, program, da dobi podatke o vseh receptih potrebuje preko 20 minut, zato program vrača v terminal svoje stanje o napredku.
+Če želite, pognati program sami naložite datoteki main.py in pomozne_funkcije.py in jih shranite v isto direktorijo. Da bo program deloval morate imeti naloženo knjižnico BeautifulSoup4. To naredite, tako da v ukazno vrstico napišete pip install BeautifulSoup4. Nato poženite main.py. Ta bo ustvaril datoteko "podatki.csv", kamor bo zapisoval podatke o receptih. Opozorilo, program, da dobi podatke o vseh receptih potrebuje preko 20 minut, zato program vrača v terminal svoje stanje o napredku.
+
+Podatki so nato analizirani v Jupyter Notebooku s pomočjo knjižnice "Pandas"

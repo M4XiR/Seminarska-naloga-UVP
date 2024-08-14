@@ -11,4 +11,5 @@ Za seminarsko nalogo sem izbral analizo receptov na strani [okusno.je](https://o
 * Skupnemu času,
 * Vrsti kuhinje,
 * Energijski vrednosti na porcijo.
+  
 Te podatke nato zapiše v datoteko "podatki.csv".

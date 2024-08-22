@@ -46,20 +46,22 @@ def main():
             # funkcija ima v seznamu naenkrat le 20 povezav
             for link in seznam_vseh_linkov_do_receptov:
                 seznam_linkov.append("https://okusno.je"+link.get('href'))
-            # zanka gre po vseh povezavah jih odpre in pobere podatke in jih zapiše v csv, če pa v nekaterih primerih ne ustreza nekaterim pogojem, to zašiše
+            # zanka gre po vseh povezavah jih odpre in pobere podatke in jih zapiše v csv, če pa v nekaterih primerih ne ustreza nekaterim pogojem, to zapiše
             for link in seznam_linkov:
-                števec_receptov += 1
+
+                števec_receptov += 1 #samo informativno o delovanju programa
                 html = naloži_spletno_stran(link)
+                
                 ime_recept = ime_recepta(html)
                 st_sestavin = stevilo_sestavin(html)
-                število_besed_v_receptu, st_odstavkov = stevilo_besed_v_receptu(
-                    html)
+                število_besed_v_receptu, st_odstavkov = stevilo_besed_v_receptu(html)
                 težavnost = tezavnost(html)
                 priprava_čas = čas_priprave(html)
                 kuhanje_čas = čas_kuhanja(html)
                 čas_skupni = skupni_čas(html)
                 vrsta_receptov = vrsta_recepta(html)
                 energijska_vrednos = energijska_vrednost(html)
+                
                 print(str(števec_receptov)+". "+ime_recept)
                 if število_besed_v_receptu == "to ni recept":
                     števec_ni_recept += 1

@@ -1,6 +1,7 @@
 ﻿# Seminarska-naloga-UVP
 ## Predstavitev
 Za seminarsko nalogo sem izbral analizo receptov na strani [okusno.je](https://okusno.je/). Na dan 14.08. 2024 je bilo na njej malo manj kot 6600 receptov. 
+Stran objavlja tudi članke na temo trikov pri kuhanju, prehrane in  druge z njo povezane teme.
 
 ## Delovanje
 Program deluje, tako da najprej iz prve strani z recepti iz gumba konec, ki te preusmeri na zadnjo stran z recepti, dobi število vseh strani z recepti. Program nato teče po teh straneh iz njih nabere povezave do samih receptov. Sproti povezave odpre in pobere iz recepta podatke o:

@@ -19,40 +19,20 @@ def stevilo_zavihkov():
     vrednost = tipka_konec.get('value')
     return vrednost
 
-
-def funkcija_ki_vrne_seznam_linkov_do_receptov():
-    seznam_vseh_linkov = []
-    for i in list(range(int(1))):
-
-        i = str(int(i)+1)
-        print(i)
-        html = naloži_spletno_stran(link_do_spletne_strani(i))
-
-    # poišče linke do strani receptov
-        soup = BeautifulSoup(html, 'html.parser')
-        seznam_vseh_linkov_do_receptov = soup.find_all(
-            'a', href=True, class_='group')
-        for link in seznam_vseh_linkov_do_receptov:
-            seznam_vseh_linkov.append("https://okusno.je"+link.get('href'))
-
-    return seznam_vseh_linkov
-
-
-#####################################################################################
-
-
 ################################################################################################
 
 # pobere podatke iz strani in ustvari csv
+
+
 def main():
-    seznam_linkov = funkcija_ki_vrne_seznam_linkov_do_receptov()
+
     števec_ni_recept = 0
     števec_receptov = 0
     with open("podatki.csv", "w", encoding="utf-8", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(["Ime recepta", "Število sestavin", "Število besed v receptu", "Število odstavkov", "Težavnost",
                         "Čas priprave", "Čas kuhanja", "Skupni čas", "Vrsta kuhinje", "Energijska vrednost na porcijo"])
-
+        # vse povezave do strani so iste oblike zato lahko zanka teče po številih, ki jih dobi iz števila vseh strani
         for i in list(range(int(stevilo_zavihkov()))):
             i = str(int(i)+1)
             print("stran "+str(i)+" od " + str(stevilo_zavihkov()))
@@ -62,9 +42,11 @@ def main():
             soup = BeautifulSoup(html, 'html.parser')
             seznam_vseh_linkov_do_receptov = soup.find_all(
                 'a', href=True, class_='group')
+
+            # funkcija ima v seznamu naenkrat le 20 povezav
             for link in seznam_vseh_linkov_do_receptov:
                 seznam_linkov.append("https://okusno.je"+link.get('href'))
-
+            # zanka gre po vseh povezavah jih odpre in pobere podatke in jih zapiše v csv, če pa v nekaterih primerih ne ustreza nekaterim pogojem, to zašiše
             for link in seznam_linkov:
                 števec_receptov += 1
                 html = naloži_spletno_stran(link)
@@ -95,6 +77,7 @@ def main():
                                     težavnost, priprava_čas, kuhanje_čas, čas_skupni, vrsta_receptov, energijska_vrednos])
 
     print(števec_ni_recept)
+############################################################
 
 
 if __name__ == "__main__":

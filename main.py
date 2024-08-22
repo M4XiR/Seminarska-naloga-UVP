@@ -61,7 +61,7 @@ def main():
                 čas_skupni = skupni_čas(html)
                 vrsta_receptov = vrsta_recepta(html)
                 energijska_vrednos = energijska_vrednost(html)
-                
+
                 print(str(števec_receptov)+". "+ime_recept)
                 if število_besed_v_receptu == "to ni recept":
                     števec_ni_recept += 1
@@ -78,7 +78,8 @@ def main():
                     writer.writerow([ime_recept, st_sestavin, število_besed_v_receptu, st_odstavkov,
                                     težavnost, priprava_čas, kuhanje_čas, čas_skupni, vrsta_receptov, energijska_vrednos])
 
-    print(števec_ni_recept)
+    print(f"Število neustreznih receptov: {števec_ni_recept}")
+    print("Program je zaključil z nabiranjem podatkov.")
 ############################################################
 
 

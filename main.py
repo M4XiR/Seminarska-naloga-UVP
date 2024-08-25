@@ -1,7 +1,7 @@
 
 from bs4 import BeautifulSoup
 import csv
-from pomozne_funkcije import čas_priprave, čas_kuhanja, skupni_čas, stevilo_sestavin, tezavnost, vrsta_recepta, stevilo_besed_v_receptu, energijska_vrednost, ime_recepta, naloži_spletno_stran
+from pomozne_funkcije import *
 
 
 def link_do_spletne_strani(stevilka_strani):
@@ -25,7 +25,7 @@ def stevilo_zavihkov():
 
 
 def main():
-
+    
     števec_ni_recept = 0
     števec_receptov = 0
     with open("podatki.csv", "w", encoding="utf-8", newline="") as file:
